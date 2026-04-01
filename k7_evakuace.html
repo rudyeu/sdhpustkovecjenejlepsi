@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evakuační zavazadlo</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#07111f;
+  color:white;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.container{
+  width:min(92vw, 640px);
+  text-align:center;
+  padding:24px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:24px;
+  box-shadow:0 20px 50px rgba(0,0,0,.3);
+}
+
+h1{
+  margin-top:0;
+  margin-bottom:10px;
+}
+
+.sub{
+  color:#bfd0ea;
+  margin-bottom:18px;
+}
+
+.canvas-wrap{
+  background:white;
+  border-radius:20px;
+  padding:14px;
+  margin-bottom:20px;
+}
+
+canvas{
+  width:100%;
+  max-width:420px;
+  height:auto;
+  display:block;
+  margin:auto;
+  border-radius:14px;
+  background:white;
+}
+
+.buttons{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+button, a.menu-btn{
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  text-decoration:none;
+  min-width:150px;
+  padding:14px 18px;
+  border:none;
+  border-radius:15px;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.yes{background:#22c55e;color:#062b12;}
+.no{background:#ef4444;color:white;}
+.back{background:#334155;color:white;}
+
+.result{
+  margin-top:14px;
+  font-size:20px;
+  font-weight:900;
+  min-height:28px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Evakuační zavazadlo</h1>
+  <div class="sub">Rozhodni, jestli danou věc bereš s sebou, nebo ne.</div>
+
+  <div class="canvas-wrap">
+    <canvas id="canvas" width="420" height="420"></canvas>
+  </div>
+
+  <div class="buttons">
+    <button class="yes" onclick="answer(true)">Beru s sebou</button>
+    <button class="no" onclick="answer(false)">Neberu</button>
+    <a class="menu-btn back" href="k7.html">Zpět do menu</a>
+  </div>
+
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+const pages = [
+  { src: "assets_evakuace/page1.png", ok: true,  cols: 3, rows: 4, useRows: 4 },
+  { src: "assets_evakuace/page2.png", ok: true,  cols: 3, rows: 4, useRows: 4 },
+  { src: "assets_evakuace/page3.png", ok: true,  cols: 3, rows: 2, useRows: 2 }, // jen horní část bez textu
+  { src: "assets_evakuace/page4.png", ok: false, cols: 3, rows: 4, useRows: 4 },
+  { src: "assets_evakuace/page5.png", ok: false, cols: 3, rows: 1, useRows: 1 }  // jen 3 obrázky nahoře
+];
+
+let items = [];
+let current = 0;
+
+function loadAll(){
+  let loaded = 0;
+
+  pages.forEach(page => {
+    const img = new Image();
+    img.src = page.src;
+
+    img.onload = () => {
+      const cropHeight = img.height;
+      const cellW = img.width / page.cols;
+      const cellH = cropHeight / page.rows;
+
+      for(let y = 0; y < page.useRows; y++){
+        for(let x = 0; x < page.cols; x++){
+          items.push({
+            img: img,
+            x: x * cellW,
+            y: y * cellH,
+            w: cellW,
+            h: cellH,
+            ok: page.ok
+          });
+        }
+      }
+
+      loaded++;
+      if(loaded === pages.length){
+        shuffle(items);
+        draw();
+      }
+    };
+  });
+}
+
+function draw(){
+  const c = document.getElementById("canvas");
+  const ctx = c.getContext("2d");
+  const it = items[current];
+
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  // jemný vnitřní ořez, ať tam nejsou černé linky gridu
+  const padX = it.w * 0.06;
+  const padY = it.h * 0.06;
+
+  ctx.drawImage(
+    it.img,
+    it.x + padX, it.y + padY,
+    it.w - 2 * padX, it.h - 2 * padY,
+    0, 0, c.width, c.height
+  );
+
+  document.getElementById("result").textContent = "";
+}
+
+function answer(user){
+  const correct = items[current].ok;
+  const r = document.getElementById("result");
+
+  if(user === correct){
+    r.textContent = "✅ Správně";
+    r.style.color = "#4ade80";
+  } else {
+    r.textContent = "❌ Špatně";
+    r.style.color = "#f87171";
+  }
+
+  setTimeout(() => {
+    current = (current + 1) % items.length;
+    draw();
+  }, 800);
+}
+
+function shuffle(arr){
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+loadAll();
+</script>
+
+</body>
+</html>

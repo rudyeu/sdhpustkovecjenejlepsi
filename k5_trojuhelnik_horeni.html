@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K5 – Trojúhelník hoření</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root{
+      --bg1:#07111f;
+      --bg2:#0f1f38;
+      --panel:rgba(255,255,255,0.08);
+      --line:rgba(255,255,255,0.12);
+      --text:#eef4ff;
+      --muted:#bfd0ea;
+      --good:#86efac;
+      --goodText:#052814;
+      --bad:#fca5a5;
+      --badText:#3b0a0a;
+      --left:#60a5fa;
+      --right:#fb7185;
+      --bottom:#f59e0b;
+    }
+    body{
+      margin:0;
+      font-family:Inter, Arial, sans-serif;
+      color:var(--text);
+      min-height:100vh;
+      background:
+        radial-gradient(circle at top, rgba(56,189,248,0.12), transparent 30%),
+        linear-gradient(135deg, var(--bg1), var(--bg2) 45%, #09111f);
+    }
+    .container{
+      max-width:1100px;
+      margin:0 auto;
+      padding:32px 18px 50px;
+    }
+    .hero, .panel{
+      border:1px solid var(--line);
+      border-radius:28px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      box-shadow:0 20px 60px rgba(0,0,0,0.28);
+      backdrop-filter:blur(12px);
+    }
+    .hero{ padding:28px; margin-bottom:22px; }
+    .eyebrow{
+      display:inline-block;
+      font-size:12px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(45,212,191,0.12);
+      color:#99f6e4;
+      border:1px solid rgba(45,212,191,0.18);
+      font-weight:700;
+      margin-bottom:14px;
+    }
+    h1{ margin:0 0 10px; font-size:clamp(30px, 5vw, 52px); line-height:1.05; }
+    .lead{ margin:0; color:var(--muted); font-size:18px; line-height:1.6; max-width:760px; }
+    .back-link{
+      display:inline-flex; margin-top:18px; color:#cfe4ff; text-decoration:none; font-weight:700;
+      padding:10px 14px; border-radius:14px; background:rgba(255,255,255,0.07); border:1px solid var(--line);
+    }
+    .layout{ display:grid; grid-template-columns:minmax(0, 1fr) 320px; gap:22px; align-items:start; }
+    .panel{ padding:22px; overflow:hidden; }
+    .topbar{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; margin-bottom:16px;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px;
+      background:rgba(255,255,255,0.1); border:1px solid var(--line); font-size:13px; font-weight:700; color:#e0ebff;
+    }
+    h2{ margin:10px 0 6px; font-size:30px; }
+    .sub{ margin:0; color:var(--muted); line-height:1.55; }
+    .card{
+      margin-top:16px; padding:18px; border-radius:24px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.04)); border:1px solid var(--line);
+    }
+    .instruction{ font-size:16px; color:#f8fbff; font-weight:800; margin-bottom:14px; }
+    .result{
+      margin-top:14px; min-height:54px; font-size:18px; font-weight:900; border-radius:16px;
+      padding:14px 16px; display:flex; align-items:center;
+    }
+    .good{ color:var(--goodText); background:var(--good); border:1px solid #4ade80; }
+    .bad{ color:var(--badText); background:var(--bad); border:1px solid #f87171; }
+
+    .triangle-wrap{
+      position:relative; height:620px; border-radius:22px; background:#edf1f7;
+      border:1px solid rgba(255,255,255,0.1); overflow:hidden; padding:20px;
+    }
+    .triangle-svg{
+      position:absolute; inset:20px; width:calc(100% - 40px); height:calc(100% - 40px); pointer-events:none;
+    }
+    .center-fire{
+      position:absolute; left:50%; top:54%; transform:translate(-50%, -50%);
+      width:120px; height:120px; border-radius:50%; background:#f6b94f;
+      display:flex; align-items:center; justify-content:center; color:#111; font-weight:900; font-size:34px;
+      box-shadow:0 8px 20px rgba(0,0,0,.15); z-index:2;
+    }
+    .dropzone{
+      position:absolute; z-index:3; border:3px dashed rgba(15,23,42,.2); background:rgba(255,255,255,0.82);
+      color:#0f172a; border-radius:20px; display:flex; align-items:flex-start; justify-content:flex-start;
+      text-align:center; padding:12px; font-weight:800; transition:.15s ease; flex-wrap:wrap; gap:8px;
+    }
+    .dropzone.over{ box-shadow:0 0 0 6px rgba(45,212,191,0.12); transform:scale(1.02); }
+    .dropzone.left{ left:34px; top:118px; width:210px; min-height:112px; }
+    .dropzone.right{ right:34px; top:118px; width:210px; min-height:112px; }
+    .dropzone.bottom{ left:50%; bottom:22px; transform:translateX(-50%); width:320px; min-height:112px; }
+    .dropzone.left.over, .dropzone.right.over{ transform:scale(1.02); }
+    .dropzone.bottom.over{ transform:translateX(-50%) scale(1.02); }
+    .dropzone.filled{ border-style:solid; }
+    .dropzone.left.filled{ background:rgba(96,165,250,.18); border-color:var(--left); }
+    .dropzone.right.filled{ background:rgba(251,113,133,.18); border-color:var(--right); }
+    .dropzone.bottom.filled{ background:rgba(245,158,11,.18); border-color:var(--bottom); }
+
+    .zone-title{
+      position:absolute; z-index:4; font-size:14px; font-weight:900; color:#0f172a;
+      background:rgba(255,255,255,.88); border:1px solid rgba(15,23,42,.1);
+      border-radius:999px; padding:8px 12px;
+    }
+    .zone-title.left{ left:44px; top:76px; }
+    .zone-title.right{ right:44px; top:76px; }
+    .zone-title.bottom{ left:50%; bottom:144px; transform:translateX(-50%); }
+
+    .bank{
+      display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:12px;
+      padding:14px; border-radius:18px; background:rgba(7,17,31,0.45); border:1px solid var(--line);
+    }
+    .drag{
+      user-select:none; cursor:grab; border-radius:18px; border:1px solid rgba(255,255,255,.15);
+      background:rgba(255,255,255,.08); color:white; padding:12px 10px; font-weight:800;
+      text-align:center; box-shadow:0 10px 24px rgba(0,0,0,.2);
+      display:grid; gap:10px; align-content:start; justify-items:center; min-height:120px;
+    }
+    .drag:active{ cursor:grabbing; }
+    .icon{
+      width:62px; height:62px; border-radius:18px; display:flex; align-items:center; justify-content:center;
+      font-size:38px; background:rgba(255,255,255,.08);
+    }
+    .pill{
+      padding:8px 10px; border-radius:14px; background:rgba(255,255,255,.75);
+      border:1px solid rgba(15,23,42,.12); font-weight:800; font-size:14px;
+      display:inline-flex; align-items:center; gap:6px; color:#0f172a;
+    }
+
+    .buttons{ display:flex; flex-wrap:wrap; gap:12px; margin-top:14px; }
+    .btn{
+      border:0; border-radius:16px; padding:12px 18px; font-size:15px; font-weight:800; cursor:pointer;
+    }
+    .btn.primary{ background:linear-gradient(135deg, #34d399, #22c55e); color:#03230f; }
+    .btn.secondary{ background:rgba(255,255,255,0.12); color:white; border:1px solid var(--line); }
+
+    .step{
+      display:flex; gap:12px; align-items:flex-start; padding:14px; border-radius:18px;
+      border:1px solid var(--line); background:rgba(255,255,255,0.04); margin-bottom:12px;
+    }
+    .step-num{
+      width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.12);
+      display:flex; align-items:center; justify-content:center; font-weight:900; flex:none;
+    }
+    .legend{ display:grid; gap:10px; margin-top:14px; }
+    .legend-item{ padding:12px 14px; border-radius:16px; font-weight:800; border:1px solid rgba(255,255,255,.12); }
+    .legend-left{ background:rgba(96,165,250,.12); }
+    .legend-right{ background:rgba(251,113,133,.12); }
+    .legend-bottom{ background:rgba(245,158,11,.12); }
+    .tiny{ color:var(--muted); font-size:13px; line-height:1.6; margin-top:14px; }
+
+    @media (max-width: 980px){
+      .layout{ grid-template-columns:1fr; }
+      .bank{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+      .triangle-wrap{ height:600px; }
+    }
+    @media (max-width: 640px){
+      .bank{ grid-template-columns:1fr; }
+      .triangle-wrap{ height:620px; padding:14px; }
+      .triangle-svg{ inset:14px; width:calc(100% - 28px); height:calc(100% - 28px); }
+      .dropzone.left{ left:12px; top:128px; width:150px; min-height:112px; }
+      .dropzone.right{ right:12px; top:128px; width:150px; min-height:112px; }
+      .dropzone.bottom{ width:250px; bottom:18px; }
+      .zone-title.left{ left:16px; top:86px; }
+      .zone-title.right{ right:16px; top:86px; }
+      .zone-title.bottom{ bottom:152px; }
+      .center-fire{ width:104px; height:104px; font-size:28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <div class="eyebrow">K5 – Požární ochrana</div>
+      <h1>Trojúhelník hoření</h1>
+      <p class="lead">Tady už jsou tři části trojúhelníku napsané rovnou. Ty jen přetahuješ obrázky ke správné části.</p>
+      <a href="index.html" class="back-link">← Zpět na hlavní výběr</a>
+    </section>
+
+    <section class="layout">
+      <div class="panel">
+        <div class="topbar">
+          <div>
+            <div class="badge">K5</div>
+            <h2>Trojúhelník hoření</h2>
+            <p class="sub">Přiřaď obrázky ke správné části trojúhelníku.</p>
+          </div>
+          <div class="badge">1 úloha</div>
+        </div>
+
+        <div class="card">
+          <div class="instruction">Přetáhni obrázky: </div>
+
+          <div class="bank" id="dragBank"></div>
+
+          <div class="triangle-wrap">
+            <svg class="triangle-svg" viewBox="0 0 1000 760" aria-hidden="true">
+              <polygon points="500,70 120,690 880,690" fill="none" stroke="#ff6464" stroke-width="24" />
+            </svg>
+
+            <div class="center-fire">oheň</div>
+
+            <div class="zone-title left">oxidovadlo (kyslík)</div>
+            <div class="zone-title right">iniciační energie (zápalná teplota)</div>
+            <div class="zone-title bottom">hořlavina (hořlavý materiál)</div>
+
+            <div class="dropzone left" data-zone="left"></div>
+            <div class="dropzone right" data-zone="right"></div>
+            <div class="dropzone bottom" data-zone="bottom"></div>
+          </div>
+
+          <div class="buttons">
+            <button class="btn primary" id="checkBtn">Zkontrolovat</button>
+            <button class="btn secondary" id="resetBtn">Reset</button>
+          </div>
+
+          <div class="result" id="resultBox"></div>
+        </div>
+      </div>
+
+      <aside class="panel">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>
+            <strong>Levá strana</strong><br />
+            Oxidovadlo (kyslík)
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>
+            <strong>Pravá strana</strong><br />
+            Iniciační energie (zápalná teplota)
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>
+            <strong>Spodní strana</strong><br />
+            Hořlavina (hořlavý materiál)
+          </div>
+        </div>
+
+        
+
+  <script>
+      const items = [
+  { id: 'shirt', img: 'assets/triko.png', zone: 'bottom' },
+  { id: 'book', img: 'assets/kniha.png', zone: 'bottom' },
+  { id: 'can', img: 'assets/kanystr.png', zone: 'bottom' },
+  { id: 'log', img: 'assets/drevo.png', zone: 'bottom' },
+  { id: 'hay', img: 'assets/seno.png', zone: 'bottom' },
+
+  { id: 'flame', text: 'plamen', img: 'assets/ohen.png', zone: 'right' },
+  { id: 'iron', text: 'žehlička', img: 'assets/zehlicka.png', zone: 'right' },
+  { id: 'sun', text: 'slunce', img: 'assets/slunce.png', zone: 'right' },
+
+  { id: 'air', text: 'kyslík', img: 'assets/kyslik.png', zone: 'left' }
+];
+
+    const state = { assignments: {}, dragId: null };
+
+    const dragBank = document.getElementById('dragBank');
+    const resultBox = document.getElementById('resultBox');
+    const checkBtn = document.getElementById('checkBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const allZones = [...document.querySelectorAll('.dropzone')];
+
+    function getItemsInZone(zoneName) {
+      return items.filter(item => state.assignments[item.id] === zoneName);
+    }
+
+    function createDragElement(item) {
+      const el = document.createElement('div');
+      el.className = 'drag';
+      el.draggable = true;
+      el.dataset.id = item.id;
+      el.innerHTML = '<img src="' + item.img + '" style="width:80px;height:80px;object-fit:contain;">';
+
+      el.addEventListener('dragstart', (event) => {
+        state.dragId = item.id;
+        event.dataTransfer.setData('text/plain', item.id);
+      });
+
+      return el;
+    }
+
+    function renderBank() {
+      dragBank.innerHTML = '';
+      items.forEach(item => {
+        if (!state.assignments[item.id]) {
+          dragBank.appendChild(createDragElement(item));
+        }
+      });
+    }
+
+    function renderZone(zoneEl) {
+      const zoneName = zoneEl.dataset.zone;
+      const zoneItems = getItemsInZone(zoneName);
+      zoneEl.innerHTML = '';
+      zoneEl.classList.toggle('filled', zoneItems.length > 0);
+
+      zoneItems.forEach(item => {
+        const pill = document.createElement('div');
+        pill.className = 'pill';
+        pill.innerHTML = '<img src="' + item.img + '" style="width:40px;height:40px;object-fit:contain;">';
+        zoneEl.appendChild(pill);
+      });
+    }
+
+    function renderZones() {
+      allZones.forEach(renderZone);
+    }
+
+    function allItemsAssigned() {
+      return items.every(item => state.assignments[item.id]);
+    }
+
+    function validate() {
+      return items.every(item => state.assignments[item.id] === item.zone);
+    }
+
+    function render() {
+      resultBox.textContent = '';
+      resultBox.className = 'result';
+      renderBank();
+      renderZones();
+    }
+
+    checkBtn.addEventListener('click', () => {
+      if (!allItemsAssigned()) {
+        resultBox.textContent = '❌ Nejdřív rozmísti všechny obrázky.';
+        resultBox.className = 'result bad';
+        return;
+      }
+
+      if (!validate()) {
+        resultBox.textContent = '❌ Něco je špatně. Zkus rozdělení upravit.';
+        resultBox.className = 'result bad';
+        return;
+      }
+
+      resultBox.textContent = '✅ Správně. Všechno je přiřazené dobře.';
+      resultBox.className = 'result good';
+    });
+
+    resetBtn.addEventListener('click', () => {
+      state.assignments = {};
+      render();
+    });
+
+    allZones.forEach(zone => {
+      zone.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        zone.classList.add('over');
+      });
+
+      zone.addEventListener('dragleave', () => {
+        zone.classList.remove('over');
+      });
+
+      zone.addEventListener('drop', (event) => {
+        event.preventDefault();
+        zone.classList.remove('over');
+        const itemId = event.dataTransfer.getData('text/plain') || state.dragId;
+        if (!itemId) return;
+        state.assignments[itemId] = zone.dataset.zone;
+        renderBank();
+        renderZones();
+      });
+    });
+
+    dragBank.addEventListener('dragover', (event) => {
+      event.preventDefault();
+    });
+
+    dragBank.addEventListener('drop', (event) => {
+      event.preventDefault();
+      const itemId = event.dataTransfer.getData('text/plain') || state.dragId;
+      if (!itemId) return;
+      delete state.assignments[itemId];
+      renderBank();
+      renderZones();
+    });
+
+    render();
+  </script>
+</body>
+</html>

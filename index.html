@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZHVB trénink</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --bg1: #07111f;
+      --bg2: #0f1f38;
+      --panel: rgba(255,255,255,0.08);
+      --line: rgba(255,255,255,0.12);
+      --text: #eef4ff;
+      --muted: #bfd0ea;
+      --card: rgba(255,255,255,0.06);
+    }
+   body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(56,189,248,0.12), transparent 30%),
+    linear-gradient(135deg, var(--bg1), var(--bg2) 45%, #09111f);
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 18px 60px;
+}
+    .hero {
+      margin-bottom: 22px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+      backdrop-filter: blur(12px);
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(45,212,191,0.12);
+      color: #99f6e4;
+      border: 1px solid rgba(45,212,191,0.18);
+      font-weight: 700;
+    }
+    h1 {
+      font-size: clamp(34px, 5vw, 56px);
+      margin: 16px 0 10px;
+      line-height: 1.05;
+    }
+    .lead {
+      max-width: 780px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
+    .menu-btn {
+      border: 0;
+      color: white;
+      text-align: left;
+      border-radius: 24px;
+      padding: 22px 20px;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+      box-shadow: 0 18px 32px rgba(0,0,0,0.24);
+    }
+    .menu-btn:hover { transform: translateY(-3px); opacity: .98; }
+    .menu-btn small {
+      display: block;
+      font-size: 12px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      opacity: .9;
+      margin-bottom: 8px;
+    }
+    .menu-btn strong {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+    .menu-btn span {
+      display: block;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+    .k2 { background: linear-gradient(135deg, #16a34a, #0891b2); }
+    .k5 { background: linear-gradient(135deg, #dc2626, #f97316); }
+    .k6 { background: linear-gradient(135deg, #0284c7, #06b6d4); }
+    .k7 { background: linear-gradient(135deg, #7c3aed, #d946ef); }
+    .hidden { display: none !important; }
+  .quiz {
+  display: grid;
+  grid-template-columns: minmax(0, 680px) minmax(260px, 300px);
+  gap: 22px;
+  margin: 30px auto 0;
+  justify-content: center;
+  align-items: start;
+}
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      overflow: hidden;
+    }
+    .panel-main, .panel-side { padding: 22px; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--line);
+      font-size: 13px;
+      font-weight: 700;
+      color: #e0ebff;
+    }
+    h2 {
+      margin: 10px 0 6px;
+      font-size: 32px;
+    }
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 16px 0 18px;
+    }
+    .chip {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      color: white;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .chip.active {
+      background: linear-gradient(135deg, rgba(45,212,191,0.24), rgba(96,165,250,0.22));
+      border-color: rgba(125,211,252,0.35);
+    }
+    .card {
+      padding: 18px;
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.04));
+      border: 1px solid var(--line);
+    }
+    .question-meta {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .image-box {
+      min-height: 430px;
+      border-radius: 22px;
+      background: #edf1f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 16px;
+    }
+    .image-box img {
+      max-width: 100%;
+      max-height: 520px;
+      object-fit: contain;
+      display: block;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+    }
+    label {
+      display: block;
+      font-weight: 800;
+      margin: 8px 0 8px;
+      color: #f8fbff;
+    }
+    textarea {
+      width: 100%;
+      min-height: 72px;
+      height: 72px;
+      resize: vertical;
+      border: 1px solid rgba(255,255,255,0.16);
+      outline: none;
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-size: 16px;
+      background: rgba(7,17,31,0.7);
+      color: white;
+    }
+    textarea:focus {
+      border-color: rgba(45,212,191,0.65);
+      box-shadow: 0 0 0 4px rgba(45,212,191,0.12);
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .btn {
+      border: 0;
+      border-radius: 16px;
+      padding: 12px 18px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn.primary { background: linear-gradient(135deg, #34d399, #22c55e); color: #03230f; }
+    .btn.secondary { background: rgba(255,255,255,0.12); color: white; border: 1px solid var(--line); }
+    .result {
+      margin-top: 14px;
+      min-height: 54px;
+      font-size: 18px;
+      font-weight: 900;
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+    }
+    .good {
+      color: #052814;
+      background: #86efac;
+      border: 1px solid #4ade80;
+    }
+    .bad {
+      color: #3b0a0a;
+      background: #fca5a5;
+      border: 1px solid #f87171;
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .stat {
+      padding: 16px;
+      border-radius: 20px;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+    .stat .n {
+      font-size: 28px;
+      font-weight: 900;
+      display: block;
+      margin-top: 6px;
+    }
+    .side-title {
+      font-size: 20px;
+      margin: 0 0 8px;
+    }
+    .note, .tiny {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .note { margin: 0 0 16px; }
+    .tiny { font-size: 13px; }
+    .list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .list-item {
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+    }
+    .list-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+    @media (max-width: 920px) {
+  .quiz {
+    grid-template-columns: 1fr;
+    justify-content: stretch;
+  }
+  .image-box { min-height: 300px; }
+  h2 { font-size: 28px; }
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero" id="menuScreen">
+      <div class="eyebrow">ZHVB trénink</div>
+      <h1>Vyber si kategorii</h1>
+      <p class="lead">Po kliknutí na K2 se otevře procvičování z materiálu. Vždy uvidíš jeden obrázek a pod ním místo, kam napíšeš odpověď.</p>
+
+      <div class="menu">
+        <button class="menu-btn k2" onclick="openCategory('K2')">
+          <small>1. kategorie</small>
+          <strong>K2 – Orientace v přírodě</strong>
+          <span>Zachvilku MČR</span>
+        </button>
+        <button class="menu-btn k5" onclick="window.location.href='k5_menu.html'">
+          <small>2. kategorie</small>
+          <strong>K5 – Požární ochrana</strong>
+          <span>Dominik bude šťastný</span>
+        </button>
+        <button class="menu-btn k6" onclick="window.location.href='k6_prvni_pomoc.html'">
+  <small>3. kategorie</small>
+  <strong>K6 – Základy první pomoci</strong>
+          <span>Marťa bude šťastná</span>
+        </button>
+        <button class="menu-btn k7" onclick="window.location.href='k7.html'">
+  <small>4. kategorie</small>
+  <strong>K7 – Ochrana obyvatelstva</strong>
+  <span>Vojta možná</span>
+</button>
+        </button>
+      </div>
+    </section>
+
+    <section id="quizScreen" class="quiz hidden">
+      <div class="panel panel-main">
+        <div class="topbar">
+          <div>
+            <div class="badge" id="badge">K2</div>
+            <h2 id="title">K2 – Orientace v přírodě</h2>
+            <p class="sub" id="subtitle">Poznávačka z obrázků.</p>
+          </div>
+          <div class="badge" id="counter">Otázka 1 / 64</div>
+        </div>
+
+        <div id="k2Filters" class="filters hidden">
+          <button class="chip active" data-mode="all" onclick="setK2Mode('all')">Všechno</button>
+          <button class="chip" data-mode="nature" onclick="setK2Mode('nature')">Příroda</button>
+          <button class="chip" data-mode="signs" onclick="setK2Mode('signs')">Turistické značky</button>
+          <button class="chip" data-mode="random" onclick="setK2Mode('random')">Náhodně</button>
+        </div>
+
+        <div class="card">
+          <div class="question-meta">
+            <div id="groupLabel">Příroda</div>
+            <div id="prompt">Co je na obrázku?</div>
+          </div>
+
+          <div class="image-box">
+            <img id="questionImage" src="" alt="Otázka" />
+          </div>
+
+          <label for="answerInput">Napiš odpověď:</label>
+          <textarea id="answerInput" placeholder="Sem napiš svou odpověď..."></textarea>
+
+          <div class="actions">
+            <button class="btn primary" onclick="checkAnswer()">Zkontrolovat</button>
+            <button class="btn secondary" onclick="nextQuestion()">Další otázka</button>
+            <button class="btn secondary" onclick="shuffleQuestion()">Náhodná otázka</button>
+            <button class="btn secondary" onclick="goBack()">Zpět na výběr</button>
+          </div>
+
+          <div class="result" id="result"></div>
+        </div>
+      </div>
+
+      <aside class="panel panel-side">
+        <div class="stat-grid">
+          <div class="stat">
+            Režim
+            <span class="n" id="modeLabel">Všechno</span>
+          </div>
+          <div class="stat">
+            Otázek
+            <span class="n" id="totalLabel">64</span>
+          </div>
+        </div>
+
+        <h3 class="side-title">Přehled</h3>
+        <p class="note" id="sideDescription">K2 obsahuje dvě části: poznávání přírody a turistických značek.</p>
+
+        <div class="list">
+          <div class="list-item">
+            <strong>K5 – Požární ochrana</strong>
+            Rozhraní je připravené, ale materiály sem zatím nejsou nahrané.
+          </div>
+          <div class="list-item">
+            <strong>K6 – Základy první pomoci</strong>
+            Rozhraní je připravené, ale materiály sem zatím nejsou nahrané.
+          </div>
+          <div class="list-item">
+            <strong>K7 – Ochrana obyvatelstva</strong>
+            Rozhraní je připravené, ale materiály sem zatím nejsou nahrané.
+          </div>
+        </div>
+
+        <p class="tiny">Kontrola odpovědi bere diakritiku i menší odchylky rozumně. U delších názvů stačí napsat správný název přirozeně, ne úplně na písmeno přesně.</p>
+      </aside>
+    </section>
+  </div>
+
+  <script>
+    const k2Questions = [{"id": "nature-1", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_1.png", "answer": "Ježek"}, {"id": "nature-2", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_2.png", "answer": "Pes"}, {"id": "nature-3", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_3.png", "answer": "Zajíc"}, {"id": "nature-4", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_4.png", "answer": "Lípa"}, {"id": "nature-5", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_5.png", "answer": "Smrk"}, {"id": "nature-6", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_6.png", "answer": "Bříza"}, {"id": "nature-7", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_7.png", "answer": "Kopřiva"}, {"id": "nature-8", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_8.png", "answer": "Sněženka"}, {"id": "nature-9", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_9.png", "answer": "Pampeliška nebo smetánka"}, {"id": "nature-10", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_10.png", "answer": "Jelen"}, {"id": "nature-11", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_11.png", "answer": "Veverka"}, {"id": "nature-12", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_12.png", "answer": "Divoké prase"}, {"id": "nature-13", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_13.png", "answer": "Borůvka"}, {"id": "nature-14", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_14.png", "answer": "Rulík"}, {"id": "nature-15", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_15.png", "answer": "Vraní oko"}, {"id": "nature-16", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_16.png", "answer": "Jedle"}, {"id": "nature-17", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_17.png", "answer": "Dub"}, {"id": "nature-18", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_18.png", "answer": "Borovice"}, {"id": "nature-19", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_19.png", "answer": "Buk"}, {"id": "nature-20", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_20.png", "answer": "Modřín"}, {"id": "nature-21", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_21.png", "answer": "Javor"}, {"id": "nature-22", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_22.png", "answer": "Mateřídouška"}, {"id": "nature-23", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_23.png", "answer": "Jitrocel"}, {"id": "nature-24", "category": "K2", "group": "Příroda", "prompt": "Co je na obrázku?", "image": "assets/k2_nature_24.png", "answer": "Heřmánek"}, {"id": "sign-1", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_1.png", "answer": "Most"}, {"id": "sign-2", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_2.png", "answer": "Parkoviště"}, {"id": "sign-3", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_3.png", "answer": "Hotel"}, {"id": "sign-4", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_4.png", "answer": "Jeskyně"}, {"id": "sign-5", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_5.png", "answer": "Pramen"}, {"id": "sign-6", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_6.png", "answer": "Restaurace"}, {"id": "sign-7", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_7.png", "answer": "Nemocnice"}, {"id": "sign-8", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_8.png", "answer": "Propast"}, {"id": "sign-9", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_9.png", "answer": "Kostel"}, {"id": "sign-10", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_10.png", "answer": "Veřejné tábořiště"}, {"id": "sign-11", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_11.png", "answer": "Turistické informace"}, {"id": "sign-12", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_12.png", "answer": "Muzeum, galerie"}, {"id": "sign-13", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_13.png", "answer": "Zřícenina"}, {"id": "sign-14", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_14.png", "answer": "Močál, bažina"}, {"id": "sign-15", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_15.png", "answer": "Vodní mlýn"}, {"id": "sign-16", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_16.png", "answer": "Minerální pramen"}, {"id": "sign-17", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_17.png", "answer": "Hrad, zámek, tvrz"}, {"id": "sign-18", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_18.png", "answer": "Turistický rozcestník"}, {"id": "sign-19", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_19.png", "answer": "Lyžařský vlek"}, {"id": "sign-20", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_20.png", "answer": "Naučná stezka"}, {"id": "sign-21", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_21.png", "answer": "Samostatné budovy"}, {"id": "sign-22", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_22.png", "answer": "Turistická stezka"}, {"id": "sign-23", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_23.png", "answer": "Cyklostezka"}, {"id": "sign-24", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_24.png", "answer": "Železniční stanice"}, {"id": "sign-25", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_25.png", "answer": "Hájovna, myslivna"}, {"id": "sign-26", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_26.png", "answer": "Odbočka k vrcholu nebo vyhlídce"}, {"id": "sign-27", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_27.png", "answer": "Odbočka ke studánce nebo pramenu"}, {"id": "sign-28", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_28.png", "answer": "Odbočka k chatě nebo přístřešku"}, {"id": "sign-29", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_29.png", "answer": "Hraniční přechod"}, {"id": "sign-30", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_30.png", "answer": "Státní hranice"}, {"id": "sign-31", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_31.png", "answer": "Výškový bod"}, {"id": "sign-32", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_32.png", "answer": "Vinice"}, {"id": "sign-33", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_33.png", "answer": "Veřejné koupaliště"}, {"id": "sign-34", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_34.png", "answer": "Autocamping"}, {"id": "sign-35", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_35.png", "answer": "Památka UNESCO"}, {"id": "sign-36", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_36.png", "answer": "Kaple"}, {"id": "sign-37", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_37.png", "answer": "Pomník"}, {"id": "sign-38", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_38.png", "answer": "Orientačně důležitý strom"}, {"id": "sign-39", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_39.png", "answer": "Přírodní zajímavost"}, {"id": "sign-40", "category": "K2", "group": "Turistické značky", "prompt": "Jak se jmenuje tato značka?", "image": "assets/k2_sign_40.png", "answer": "Stezka pro běžkaře"}];
+    
+   const state = {
+  category: null,
+  index: 0,
+  mode: 'all',
+  pool: [],
+  checked: false
+};
+
+    const placeholders = {
+      K5: {
+        title: 'K5 – Požární ochrana',
+        subtitle: 'Tahle sekce je připravená na doplnění materiálů.',
+        desc: 'Jakmile dodáš obrázky nebo zadání ke K5, půjde sem stejným stylem doplnit celý trénink.'
+      },
+      K6: {
+        title: 'K6 – Základy první pomoci',
+        subtitle: 'Tahle sekce je připravená na doplnění materiálů.',
+        desc: 'Jakmile dodáš obrázky nebo zadání ke K6, půjde sem stejným stylem doplnit celý trénink.'
+      },
+      K7: {
+        title: 'K7 – Ochrana obyvatelstva',
+        subtitle: 'Tahle sekce je připravená na doplnění materiálů.',
+        desc: 'Jakmile dodáš obrázky nebo zadání ke K7, půjde sem stejným stylem doplnit celý trénink.'
+      }
+    };
+
+    function normalizeText(text) {
+      return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function answerVariants(answer) {
+      const variants = [answer];
+      if (answer === 'Pampeliška nebo smetánka') variants.push('pampeliska', 'smetanka');
+      if (answer === 'Muzeum, galerie') variants.push('muzeum', 'galerie');
+      if (answer === 'Hrad, zámek, tvrz') variants.push('hrad', 'zamek', 'tvrz');
+      if (answer === 'Močál, bažina') variants.push('mocal', 'bazina');
+      return variants;
+    }
+
+    function setActiveChip(mode) {
+      document.querySelectorAll('.chip').forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.mode === mode);
+      });
+    }
+
+    function rebuildPool() {
+      if (state.mode === 'nature') return k2Questions.filter(q => q.group === 'Příroda');
+      if (state.mode === 'signs') return k2Questions.filter(q => q.group === 'Turistické značky');
+      if (state.mode === 'random') {
+        const arr = [...k2Questions];
+        shuffleArray(arr);
+        return arr;
+      }
+      return [...k2Questions];
+    }
+
+    function setK2Mode(mode) {
+      state.mode = mode;
+      setActiveChip(mode);
+      state.pool = rebuildPool();
+      state.index = 0;
+      renderQuestion();
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+
+    function openCategory(category) {
+      state.category = category;
+      document.getElementById('menuScreen').classList.add('hidden');
+      document.getElementById('quizScreen').classList.remove('hidden');
+      document.getElementById('result').textContent = '';
+      document.getElementById('result').className = 'result';
+
+      if (category === 'K2') {
+        document.getElementById('k2Filters').classList.remove('hidden');
+        state.mode = 'all';
+        setActiveChip('all');
+        state.pool = [...k2Questions];
+        state.index = 0;
+        renderQuestion();
+      } else {
+        document.getElementById('k2Filters').classList.add('hidden');
+        renderPlaceholder(category);
+      }
+    }
+
+    function renderPlaceholder(category) {
+      const item = placeholders[category];
+      document.getElementById('badge').textContent = category;
+      document.getElementById('title').textContent = item.title;
+      document.getElementById('subtitle').textContent = item.subtitle;
+      document.getElementById('counter').textContent = 'Materiály zatím nejsou';
+      document.getElementById('groupLabel').textContent = category;
+      document.getElementById('prompt').textContent = 'Sem se později doplní otázky.';
+      document.getElementById('questionImage').src = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560">' +
+        '<rect width="100%" height="100%" fill="#e5eef8"/>' +
+        '<rect x="70" y="70" width="760" height="420" rx="28" fill="#d6e2f0" stroke="#9fb7cf" stroke-width="6" stroke-dasharray="12 12"/>' +
+        '<text x="450" y="255" text-anchor="middle" font-size="46" fill="#24415f" font-family="Arial" font-weight="700">' + category + '</text>' +
+        '<text x="450" y="320" text-anchor="middle" font-size="28" fill="#355c86" font-family="Arial">Tady bude obrázek otázky</text>' +
+        '</svg>'
+      );
+      document.getElementById('answerInput').value = '';
+      document.getElementById('answerInput').placeholder = 'Sem pak půjde psát odpověď...';
+      document.getElementById('totalLabel').textContent = '–';
+      document.getElementById('modeLabel').textContent = 'Připraveno';
+      document.getElementById('sideDescription').textContent = item.desc;
+      document.getElementById('result').textContent = '';
+      document.getElementById('result').className = 'result';
+    }
+
+    function renderQuestion() {
+      const current = state.pool[state.index];
+      document.getElementById('badge').textContent = 'K2';
+      document.getElementById('title').textContent = 'K2 – Orientace v přírodě';
+      document.getElementById('subtitle').textContent = 'Napiš odpověď pod obrázek, jinak se bude Dominik zlobit.';
+      document.getElementById('counter').textContent = 'Otázka ' + (state.index + 1) + ' / ' + state.pool.length;
+      document.getElementById('groupLabel').textContent = current.group;
+      document.getElementById('prompt').textContent = current.prompt;
+      document.getElementById('questionImage').src = current.image;
+      document.getElementById('answerInput').value = '';
+      document.getElementById('answerInput').placeholder = 'Sem napiš svou odpověď...';
+      document.getElementById('result').textContent = '';
+      document.getElementById('result').className = 'result';
+      state.checked = false;
+
+      const modeMap = {
+        all: 'Všechno',
+        nature: 'Příroda',
+        signs: 'Topografické značky',
+        random: 'Náhodně'
+      };
+      document.getElementById('modeLabel').textContent = modeMap[state.mode];
+      document.getElementById('totalLabel').textContent = state.pool.length;
+      document.getElementById('sideDescription').textContent =
+        current.group === 'Příroda'
+          ? 'Tahle část vychází z poznávačky stop, rostlin a stromů.'
+          : 'Tahle část vychází z turistických a mapových značek.';
+    }
+
+    function checkAnswer() {
+      if (state.category !== 'K2') return;
+      const current = state.pool[state.index];
+      const user = normalizeText(document.getElementById('answerInput').value);
+      const variants = answerVariants(current.answer).map(normalizeText);
+      const ok = user.length > 0 && variants.some(v => user.includes(v) || v.includes(user));
+      const result = document.getElementById('result');
+
+      if (ok) {
+        result.textContent = '✅ Správně';
+        result.className = 'result good';
+      } else {
+        result.textContent = '❌ Správná odpověď: ' + current.answer;
+        result.className = 'result bad';
+      }
+
+      state.checked = true;
+    }
+
+ 
+    function nextQuestion() {
+      if (state.category !== 'K2') return;
+      state.index = (state.index + 1) % state.pool.length;
+      renderQuestion();
+    }
+
+    function shuffleQuestion() {
+      if (state.category !== 'K2') return;
+      state.index = Math.floor(Math.random() * state.pool.length);
+      renderQuestion();
+    }
+
+    function goBack() {
+      document.getElementById('quizScreen').classList.add('hidden');
+      document.getElementById('menuScreen').classList.remove('hidden');
+      document.getElementById('result').textContent = '';
+      document.getElementById('result').className = 'result';
+    }
+
+const answerInput = document.getElementById('answerInput');
+
+answerInput.addEventListener('keydown', function (event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+
+    if (state.category !== 'K2') return;
+
+    if (!state.checked) {
+      checkAnswer();
+    } else {
+      nextQuestion();
+    }
+  }
+});
+  </script>
+</body>
+</html>

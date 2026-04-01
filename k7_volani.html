@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K7 – Tísňová volání</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: #07111f;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.wrap {
+  max-width: 900px;
+  width: 100%;
+  padding: 30px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.question {
+  font-size: 64px;
+  font-weight: 900;
+  margin: 30px 0;
+}
+
+.options {
+  display: grid;
+  gap: 12px;
+}
+
+.btn {
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.good {
+  background: #22c55e !important;
+  color: black;
+}
+
+.bad {
+  background: #ef4444 !important;
+}
+
+.back {
+  margin-top: 25px;
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.1);
+  text-decoration: none;
+  color: white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+  <h1>Tísňová volání</h1>
+
+  <div class="question" id="number">150</div>
+
+  <div class="options" id="options"></div>
+
+  <a href="k7.html" class="back">← Zpět</a>
+</div>
+
+<script>
+const data = [
+  { num: "150", correct: "Hasiči" },
+  { num: "155", correct: "Záchranka" },
+  { num: "158", correct: "Policie" },
+  { num: "112", correct: "Evropská tísňová linka" },
+  { num: "1210", correct: "Horská služba" }
+];
+
+const allOptions = [
+  "Hasiči",
+  "Záchranka",
+  "Policie",
+  "Evropská tísňová linka",
+  "Horská služba"
+];
+
+let index = 0;
+
+function render() {
+  const q = data[index];
+  document.getElementById("number").textContent = q.num;
+
+  const container = document.getElementById("options");
+  container.innerHTML = "";
+
+  allOptions.forEach(opt => {
+    const btn = document.createElement("div");
+    btn.className = "btn";
+    btn.textContent = opt;
+
+    btn.onclick = () => {
+      if (opt === q.correct) {
+        btn.classList.add("good");
+
+        setTimeout(() => {
+          index = (index + 1) % data.length;
+          render();
+        }, 800);
+
+      } else {
+        btn.classList.add("bad");
+      }
+    };
+
+    container.appendChild(btn);
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>

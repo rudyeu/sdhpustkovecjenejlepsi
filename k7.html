@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K7 – Ochrana obyvatelstva</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Inter, Arial;
+  background:#07111f;
+  color:white;
+}
+
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:40px 20px;
+}
+
+h1{
+  font-size:40px;
+  margin-bottom:10px;
+}
+
+p{
+  color:#bfd0ea;
+  margin-bottom:30px;
+}
+
+.menu{
+  display:grid;
+  gap:20px;
+}
+
+.card{
+  padding:25px;
+  border-radius:20px;
+  cursor:pointer;
+  font-size:20px;
+  font-weight:800;
+  transition:0.2s;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+}
+
+.evakuace{ background:linear-gradient(135deg,#22c55e,#16a34a); }
+.ulicka{ background:linear-gradient(135deg,#f97316,#dc2626); }
+.volani{ background:linear-gradient(135deg,#3b82f6,#06b6d4); }
+
+.back{
+  margin-top:30px;
+  display:inline-block;
+  color:#cfe4ff;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>K7 – Ochrana obyvatelstva</h1>
+<p>Vyber si, co chceš procvičovat</p>
+
+<div class="menu">
+  <div class="card evakuace" onclick="window.location.href='k7_evakuace.html'">
+    Evakuační zavazadlo
+  </div>
+
+  <div class="card ulicka" onclick="window.location.href='k7_ulicka.html'">
+  Záchranářská ulička
+</div>
+
+  <div class="card" onclick="window.location.href='k7_volani.html'">
+  Tísňová volání
+</div>
+
+<a href="index.html" class="back">← zpět</a>
+
+</div>
+</body>
+</html>
